@@ -1,13 +1,34 @@
-import React from 'react';
+import { Routes, Route, Navigate} from "react-router-dom";
+import Login from "./pages/Auth/Login";
+import Signup from "./pages/Auth/Signup";
+import Expense from "./pages/Dashboard/Expense";
+import Income from "./pages/Dashboard/Income";
+import Home from "./pages/Dashboard/Home";
 
-const App = () => {
+
+function App() {
   return (
-    <>
-    <div className='text-center mt-5 font-bold text-2xl text-blue-600'>
-      <h1>Hello, World!</h1>
+    <div>
+      <Routes>
+        <Route path="/" element={<Root/>}/>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/expense" element={<Expense />} />
+        <Route path="/dashboard" element={<Home/>} />
+        <Route path="/income" element={<Income />} />
+      </Routes>
     </div>
-    </>
   );
 }
 
 export default App;
+
+const Root = () => {
+
+  const isAuthenticated = !!localStorage.getItem("token");
+  return isAuthenticated ? (
+    <Navigate to ="/dashboard" replace />
+  ) : (
+    <Navigate to ="/login" replace />
+  );
+}

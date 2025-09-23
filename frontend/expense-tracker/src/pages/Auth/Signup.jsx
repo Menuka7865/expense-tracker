@@ -13,7 +13,29 @@ const Signup = () => {
  
   const[error,setError] = useState(null);
   const navigate = useNavigate();
-  const handleSignup = async (e) => {}
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    let profilePicURL = "";
+
+    if (!fullName) {
+      setError("Full name is required.");
+      return;
+    }
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (!password ) { 
+      setError("Password is required.");
+      return;
+    }
+    if (password.length < 8 ) {
+      setError("Password must be at least 8 characters long.");
+      return;
+    }
+    setError("");
+  }
   return (
     <AuthLayout>
      <div className='lg:w-[100%] h-auto md:h-full mt-10 md:mt-0 flex flex-col justify-center '>
@@ -50,6 +72,14 @@ const Signup = () => {
           />
           </div>
         </div>
+         {error && <p className='text-red-500 text-sm my-2'>{error}</p>}
+
+          <button type="submit" className='bg-violet-500 w-full text-white py-3 rounded mt-4 hover:bg-violet-700 transition duration-200'>
+          Sign Up
+          </button>
+          <p className='text-[13px] text-slate-700 mt-4 text-center'>
+            Already have an account? <span className='text-blue-600 cursor-pointer' onClick={() => navigate('/login')}>  Login</span>
+          </p>
       </form>
      </div>
     </AuthLayout>

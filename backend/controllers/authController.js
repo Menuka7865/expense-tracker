@@ -23,7 +23,7 @@ exports.registerUser = async (req, res) => {
     if (!fullName || !email || !password) {
         return res.status(400).json({ message: 'Please provide all required fields' });
     }
-
+   
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -67,13 +67,10 @@ exports.loginUser = async (req, res) => {
 
 //get user profile
 exports.getUserInfo = async (req, res) => {
-    // Example: expect GET /api/v1/auth/getUser/:id
-    const userId = req.params && req.params.id;
-    if (!userId) return res.status(400).json({ message: 'Missing user id' });
     try {
-        const user = await User.findById(userId).select('-password');
+        const user = await User.findById(req.user.id).select('-password');
         if (!user) return res.status(404).json({ message: 'User not found' });
-        res.json(user);
+        res.status(200).json(user);
     } catch (error) {
         console.error('getUserInfo error:', error);
         res.status(500).json({ message: 'Server error' });

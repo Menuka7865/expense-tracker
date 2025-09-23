@@ -3,6 +3,7 @@ const express = require("express");
 const multer = require('multer');
 const path = require('path');
 const { registerUser, loginUser, getUserInfo } = require("../controllers/authController");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -23,6 +24,6 @@ router.post("/register", upload.single('profileImage'), registerUser);
 // Login a user
 router.post("/login", loginUser);
 // Get user profile
-// router.get("/getUser",protect, getUserInfo);
+router.get("/getUser",protect, getUserInfo);
 
 module.exports = router;

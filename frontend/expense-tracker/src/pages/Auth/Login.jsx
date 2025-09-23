@@ -3,6 +3,8 @@ import AuthLayout from '../../components/Layouts/AuthLayout';
 import { useNavigate } from 'react-router-dom';
 import Input from '../../components/Inputs/input';
 import { validateEmail } from '../../utils/helper';
+import axiosInstance from '../../utils/axiosInstance';
+import { API_PATHS } from '../../utils/apiPaths';
 
 
 const Login = () => {
@@ -29,6 +31,27 @@ const Login = () => {
    
 
     setError("");
+
+    try {
+      const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN,
+        { email, password }
+      );
+      console.log('Login response:', response);
+      console.log('Login response.data:', response?.data);
+      const { token, user } = response.data || {};
+
+      if (token) {
+        localStorage.setItem('token', token);
+        navigate('/dashboard');
+      } else {
+        console.warn('No token in login response, not navigating.');
+      }
+
+  }catch (error) {
+      console.error('Login error:', error);
+      const message = error.response?.data?.message || 'Login failed. Please try again.';
+      setError(message);
+    }
   };
   return (
     <>

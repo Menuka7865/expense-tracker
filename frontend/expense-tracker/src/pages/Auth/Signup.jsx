@@ -4,6 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../../components/Inputs/input';
 import { validateEmail } from '../../utils/helper';
 import ProfilePhotoSelector from '../../components/Inputs/ProfilePhotoSelector';
+import axiosInstance from '../../utils/axiosInstance';
+import { API_PATHS } from '../../utils/apiPaths';
+import { UserContext } from '../../context/userContext';
+
+
 
 const Signup = () => {
   const[profilePic,setProfilePic] = useState(null);
@@ -12,6 +17,8 @@ const Signup = () => {
   const[password,setPassword] = useState('');
  
   const[error,setError] = useState(null);
+
+  const {updateUser} = React.useContext(UserContext);
   const navigate = useNavigate();
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -35,7 +42,46 @@ const Signup = () => {
       return;
     }
     setError("");
-  }
+
+    try {
+
+      if(profilePic){
+        const formData = new FormData();
+        formData.append('profileImage', profilePic);
+        try {
+          const uploadRes = await axiosInstance.post(API_PATHS.IMAGE.UPLOAD, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          profilePicURL = uploadRes.data?.imageUrl || "";
+        } catch (uploadErr) {
+          console.error('Image upload failed:', uploadErr);
+          // non-fatal: continue without profile pic
+          profilePicURL = "";
+        }
+      }
+      const response = await axiosInstance.post(API_PATHS.AUTH.REGISTER,{
+        fullName,
+        email,
+        password,
+        profileImageUrl: profilePicURL
+      });
+      const {token,user} = response.data;
+
+      if (token) {
+        localStorage.setItem('token',token);
+        updateUser(user);
+        navigate('/dashboard');
+      } else {
+        console.warn('No token in signup response, not navigating.');
+      }
+  }catch (error) {
+      if(error.response && error.response.data && error.response.data.message){
+        setError(error.response.data.message);
+      }else{
+        setError("Signup failed. Please try again.");
+      }
+    }
+  };
   return (
     <AuthLayout>
      <div className='lg:w-[100%] h-auto md:h-full mt-10 md:mt-0 flex flex-col justify-center '>

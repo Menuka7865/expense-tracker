@@ -5,12 +5,15 @@ import Input from '../../components/Inputs/input';
 import { validateEmail } from '../../utils/helper';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
+import { UserContext } from '../../context/userContext';
 
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+
+  const {updateUser} = React.useContext(UserContext);
 
   const navigate = useNavigate(); 
   const handleLogin = async (e) => {
@@ -42,6 +45,7 @@ const Login = () => {
 
       if (token) {
         localStorage.setItem('token', token);
+        updateUser(user);
         navigate('/dashboard');
       } else {
         console.warn('No token in login response, not navigating.');

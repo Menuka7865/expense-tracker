@@ -7,7 +7,7 @@ import ProfilePhotoSelector from '../../components/Inputs/ProfilePhotoSelector';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { UserContext } from '../../context/userContext';
-
+import uploadImage from '../../utils/uploadImage';
 
 
 const Signup = () => {
@@ -49,9 +49,21 @@ const Signup = () => {
         const formData = new FormData();
         formData.append('profileImage', profilePic);
         try {
-          const uploadRes = await axiosInstance.post(API_PATHS.IMAGE.UPLOAD, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-          });
+          const baseURL = axiosInstance.defaults?.baseURL;
+          const uploadPath = API_PATHS?.IMAGE?.UPLOAD_IMAGE;
+          console.log('axiosInstance.defaults.baseURL ->', baseURL);
+          console.log('API_PATHS ->', API_PATHS);
+          console.log('API_PATHS.IMAGE ->', API_PATHS?.IMAGE);
+          console.log('uploadPath ->', uploadPath);
+          if (!uploadPath) {
+            console.error('UPLOAD_IMAGE path is undefined. Check src/utils/apiPaths.js exports.');
+            throw new Error('UPLOAD_IMAGE path is undefined');
+          }
+          const fullUrl = baseURL ? `${baseURL}${uploadPath}` : uploadPath;
+          console.log('Uploading image to:', fullUrl);
+          // let the browser set Content-Type (includes boundary)
+          const uploadRes = await axiosInstance.post(uploadPath, formData);
+          console.log('Upload response:', uploadRes);
           profilePicURL = uploadRes.data?.imageUrl || "";
         } catch (uploadErr) {
           console.error('Image upload failed:', uploadErr);

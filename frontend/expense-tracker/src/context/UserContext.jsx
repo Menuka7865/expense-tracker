@@ -1,4 +1,4 @@
-import React,{createContext,useState} from "react";
+import React,{createContext,useState,useCallback,useMemo} from "react";
 
 export const UserContext = createContext();
 
@@ -6,18 +6,21 @@ const UserProvider = ({children}) => {
     const [user,setUser] = useState(null);
 
     //function to update user data
-    const updateUser = (userData) => {
+    const updateUser = useCallback((userData) => {
         setUser(userData);
-    };
+    }, []);
 
     //function to clear user data on logout
-    const clearUser = () => {
+    const clearUser = useCallback(() => {
         setUser(null);
-    };
+    }, []);
+
+    const contextValue = useMemo(() => ({ user, updateUser, clearUser }), [user, updateUser, clearUser]);
+
     return (
-        <UserContext.Provider value={{user,updateUser,clearUser}}>
+        <UserContext.Provider value={contextValue}>
             {children}
         </UserContext.Provider>
     );
-}   
+}
 export default UserProvider;
